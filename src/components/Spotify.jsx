@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { reducerCases } from "../utils/Constants";
 import { useStateProvider } from "../utils/StateProvider";
@@ -10,6 +10,15 @@ import Sidebar from "./Sidebar";
 
 const Spotify = () => {
   const [{ token }, dispatch] = useStateProvider();
+  const bodyRef = useRef();
+  const [navBg, setNavBg] = useState(false);
+  const [headerBg, setHeaderBg] = useState(false);
+
+  const bodyScroller = () => {
+    bodyRef.current.scrollTop >= 30 ? setNavBg(true) : setNavBg(false);
+    bodyRef.current.scrollTop >= 268 ? setHeaderBg(true) : setHeaderBg(false);
+  };
+
   useEffect(() => {
     const getUserInfo = async () => {
       const { data } = await axios.get("https://api.spotify.com/v1/me", {
@@ -30,10 +39,10 @@ const Spotify = () => {
     <Container>
       <div className="spotify_body">
         <Sidebar />
-        <div className="body">
-          <Navbar />
+        <div className="body" ref={bodyRef} onScroll={bodyScroller}>
+          <Navbar navBg={navBg} />
           <div className="body_contents">
-            <Body />
+            <Body headerBg={headerBg} />
           </div>
         </div>
       </div>
