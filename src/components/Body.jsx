@@ -160,7 +160,7 @@ const Container = styled.div`
       color: #dddcdc;
       margin: 1rem 0 0 0;
       position: sticky;
-      top: 17vh;
+      top: 15vh;
       padding: 1rem 3rem;
       transition: 0.3s ease-in-out;
       background-color: ${({ headerBg }) => (headerBg ? "#000000dc" : "none")};
