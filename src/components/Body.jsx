@@ -5,7 +5,7 @@ import { useStateProvider } from "../utils/StateProvider";
 import axios from "axios";
 import { reducerCases } from "../utils/Constants";
 
-const Body = ({headerBg}) => {
+const Body = ({ headerBg }) => {
   const [{ token, selectedPlaylistId, selectedPlaylist }, dispatch] =
     useStateProvider();
 
@@ -42,6 +42,12 @@ const Body = ({headerBg}) => {
     };
     getIntialPlaylist();
   }, [token, dispatch, selectedPlaylistId]);
+
+  const convertTime = (ms) => {
+    const minutes = Math.floor(ms / 60000);
+    const seconds = ((ms % 60000) / 1000).toFixed(0);
+    return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+  };
 
   return (
     <Container headerBg={headerBg}>
@@ -109,7 +115,7 @@ const Body = ({headerBg}) => {
                         <span>{album}</span>
                       </div>
                       <div className="col">
-                        <span>{duration}</span>
+                        <span>{convertTime(duration)}</span>
                       </div>
                     </div>
                   );
@@ -157,7 +163,7 @@ const Container = styled.div`
       top: 17vh;
       padding: 1rem 3rem;
       transition: 0.3s ease-in-out;
-      background-color: ${({headerBg}) => headerBg ? "#000000dc" : "none"};
+      background-color: ${({ headerBg }) => (headerBg ? "#000000dc" : "none")};
     }
 
     .tracks {

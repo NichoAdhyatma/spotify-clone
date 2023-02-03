@@ -35,6 +35,7 @@ const Spotify = () => {
     };
     getUserInfo();
   }, [dispatch, token]);
+  
   return (
     <Container>
       <div className="spotify_body">
@@ -70,6 +71,13 @@ const Container = styled.div`
       height: 100%;
       width: 100%;
       overflow: auto;
+      &::-webkit-scrollbar {
+        width: 0.7rem;
+        &-thumb {
+          background-color: rgba(255, 255, 255, 0.6);
+          border-radius: 5rem;
+        }
+      }
     }
   }
 `;
