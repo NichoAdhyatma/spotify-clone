@@ -31,6 +31,7 @@ const CurrentTrack = () => {
     };
     getCurrentTrack();
   }, [token, dispatch]);
+  
   return (
     <Container>
       {currentPlaying && (

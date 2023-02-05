@@ -4,6 +4,7 @@ import { AiFillClockCircle } from "react-icons/ai";
 import { useStateProvider } from "../utils/StateProvider";
 import axios from "axios";
 import { reducerCases } from "../utils/Constants";
+import { toast } from "react-toastify";
 
 const Body = ({ headerBg }) => {
   const [{ token, selectedPlaylistId, selectedPlaylist }, dispatch] =
@@ -47,6 +48,85 @@ const Body = ({ headerBg }) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = ((ms % 60000) / 1000).toFixed(0);
     return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+  };
+
+  const playTrack = async (
+    id,
+    name,
+    artists,
+    image,
+    context_uri,
+    track_number
+  ) => {
+    await axios
+      .put(
+        `https://api.spotify.com/v1/me/player/play`,
+        {
+          context_uri,
+          offset: {
+            position: track_number - 1,
+          },
+          position_ms: 0,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status === 204) {
+          const currentPlaying = {
+            id,
+            name,
+            artists,
+            image,
+          };
+          dispatch({ type: reducerCases.SET_PLAYING, currentPlaying });
+          dispatch({ type: reducerCases.SET_PLAYER_STATE, playerState: true });
+        } else {
+          dispatch({ type: reducerCases.SET_PLAYER_STATE, playerState: true });
+        }
+      })
+      .catch((err) => {
+        if (err.response.status === 403) {
+          toast("PREMIUM REQUIRED", {
+            closeButton: true,
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
+      });
+
+    const response2 = await axios.get(
+      "https://api.spotify.com/v1/me/player/currently-playing",
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response2 !== "") {
+      const { item } = response2.data;
+      const currentPlaying = {
+        id: item.id,
+        name: item.name,
+        artists: item.artists.map((artist) => artist.name),
+        image: item.album.images[2].url,
+      };
+      dispatch({ type: reducerCases.SET_PLAYING, currentPlaying });
+    } else {
+      dispatch({ type: reducerCases.SET_PLAYING, currentPlaying: null });
+    }
   };
 
   return (
@@ -98,7 +178,20 @@ const Body = ({ headerBg }) => {
                   index
                 ) => {
                   return (
-                    <div className="row" key={id}>
+                    <div
+                      className="row"
+                      key={id}
+                      onClick={() =>
+                        playTrack(
+                          id,
+                          name,
+                          artists,
+                          image,
+                          context_uri,
+                          track_number
+                        )
+                      }
+                    >
                       <div className="col">
                         <span>{index + 1}</span>
                       </div>
